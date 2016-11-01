@@ -27,40 +27,34 @@ function data($scope, $http) {
     //function that grabs api data from the net
     function fetch() {
         //finding average price between 3 high volume exchanges.
-        $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/eth")
+        $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/zec")
         .success(function(response) {
             $scope.price = response.price.usd;
             $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
         });
-        $http.get("https://etherchain.org/api/difficulty")
+        $http.get("https://api.zcha.in/v1/mainnet/network")
         .success(function(response) {
             $scope.ethereumStats = response;
-            $scope.difficulty = parseFloat((($scope.ethereumStats.data[0].difficulty)/1e12).toFixed(4));
-            //console.log($scope.difficulty);
-            $http.get("https://etherchain.org/api/miningEstimator")
+            $scope.difficulty = parseFloat(((response.difficulty)).toFixed(0));
+            console.log($scope.difficulty);
+            });
+        $http.get("https://etherchain.org/api/blocks/count")
             .success(function(response) {
-                $scope.ethereumStats = response;
-                $scope.blockTime = $scope.ethereumStats.data[0].blockTime;
-                $http.get("https://etherchain.org/api/blocks/count")
-                .success(function(response) {
-                    $scope.blockCount = response.data[0].count;
-                    blockNum1MoAgo = $scope.blockCount - (30*24*60*60/$scope.blockTime);
-                    $http.get("https://etherchain.org/api/block/" + Math.round(blockNum1MoAgo))
-                    .success(function(response) {
-                        difficulty1MoAgo = response.data[0].difficulty;
-                        $scope.diffChange = parseFloat((($scope.difficulty*1e12 - difficulty1MoAgo)/1e12).toFixed(2));
-                        
-                    })
-                })
+                $scope.blockCount = response.data[0].count;
+                blockNum1MoAgo = $scope.blockCount - (30*24*60*60/$scope.blockTime);
             })
-        });
-
+        $http.get("https://etherchain.org/api/block/" + Math.round(blockNum1MoAgo))
+            .success(function(response) {
+                difficulty1MoAgo = response.data[0].difficulty;
+                $scope.diffChange = parseFloat((($scope.difficulty*1e12 - difficulty1MoAgo)/1e12).toFixed(2));
+            })             
+                    
     }
 
     //this function grabs price data only when the currency is changed
     $scope.fetchPriceOnly = function() {
         //finding average price between 3 high volume exchanges.
-        $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/eth")
+        $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/zec")
         .success(function(response) {
             if ($scope.currency == "USD") {
                 $scope.price = response.price.usd;
