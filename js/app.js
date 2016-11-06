@@ -18,7 +18,7 @@ $scope.solsPerDiff = 6000;
         var fullBlockReward = 10.000;
         var slowStartRate = 0.0005;
         if ( height < slowStartInterval ) {
-            return slowStartRate * (height + 1);
+            return (slowStartRate * (height + 1));
         } else {
             return fullBlockReward / Math.pow(2,Math.floor(height/halvingInterval));
         }
@@ -54,13 +54,11 @@ $scope.solsPerDiff = 6000;
                 //parseFloat((($scope.ethereumStats.data[0].difficulty)/1e12).toFixed(4))
                 $scope.difficulty = parseInt((response.difficulty));
                 $scope.blockReward = $scope.blockSubsidy(response.blockNumber);
-                console.log($scope.blockReward);
                 var specificBlockFetchURL = "https://api.zcha.in/v1/mainnet/blocks?sort=height&direction=descending&limit=1&offset=";
                 specificBlockFetchURL +=  Math.floor(604800/response.meanBlockTime);
                 $http.get(specificBlockFetchURL)
                     .success(function(response) {
                         $scope.diffChange = ($scope.difficulty - parseInt(response[0].difficulty));
-                        console.log($scope.diffChange);
                     })
                 });        
                         
