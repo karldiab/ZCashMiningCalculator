@@ -73,7 +73,7 @@
                         </tr>
                         <tr>
                             <th>Difficulty:</th>
-                            <td><input type="number" ng-model="difficulty" ng-change="computeProfits()"/> k</td>
+                            <td><input type="number" ng-model="difficulty" ng-change="computeProfits()"/></td>
                         </tr>
                         <tr>
                             <th>Block Reward:</th>
@@ -108,12 +108,8 @@
                             <td><input type="number" ng-model="poolFee" ng-change="computeProfits()" ng-init="poolFee = 0"/> %</td>
                         </tr>
                         <tr>
-                            <th>Miner Fee:</th>
-                            <td><input type="number" ng-model="minerFee" ng-change="computeProfits()" ng-init="minerFee = 0"/> %</td>
-                        </tr>
-                        <tr>
                             <th>Diff Change</th>
-                            <td><input type="number" ng-model="diffChange" ng-change="computeProfits()"/> k / Week</td>
+                            <td><input type="number" ng-model="diffChange" ng-change="computeProfits()"/> / Week</td>
                         </tr>
                     </table>
                     <h3>Profits At This Difficulty</h3>
@@ -182,8 +178,8 @@
                 <h3>Estimated Total Future Profits ({{currency}})</h3>
                 <canvas id="myChart" height="400px" width="300px"></canvas><br/>
                 Time Frame:
-                <input type="number" ng-model="timeFrame" id="axisChange" ng-init="timeFrame = 6" ng-change="changeAxis()"/> Months
-
+                <input type="number" ng-model="timeFrame" id="axisChange" ng-init="timeFrame = 6" ng-change="changeAxis()"/> Months</br>
+                <div style="padding-top: 5px;"><p style="color: red;">Future difficulty changes or block reward increases are not currently factored into the graph, see notes below.</p></div>
                 </div>
             </div>
             <div class="col-md-2">
@@ -202,14 +198,17 @@
         <div id="notes">
             <h4>Notes</h4>
             <ul>
-                <li><a href="https://etherchain.org/account/0xd24780aeaf3603e8902e58d46bf778a173d42721">Donation Address</a></li>
-                <li>The calculations accounts for average network blocktime, which increases accuracy but lowers predicted profit. Don't be fooled by other optimistic calculators!</li>
-                <li>Doesn't account for uncle blocks. This doesn't seem to impact overall accuracy much</li>
-                <li>The utility fetches live Ethereum network & price data from https://www.etherchain.org and http://coinmarketcap.com</li>
+                <li>For the graph, future difficulty changes or block reward increases are not taken into account, these factors make profitability
+                    too difficult to predict for such a long time frame. Dynamic-difficulty future profit prediction will be enabled after the
+                    slow-start ends.</li>
+                <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
+                <li>I'm actively tweaking the profitability calculation so accuracy will improve over the next few days.</li>
+                <li>The utility fetches live Ethereum network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
         </div>
         <div id="authorInfo">
             <a href="http://www.karldiab.com"><button class="btn btn-success btn-sm">Website</button></a>
-            <a href="https://github.com/karldiab/EthereumMiningCalculator"><button class="btn btn-primary btn-sm">Source Code</button></a>
+            <a href="https://github.com/karldiab/ZCashMiningCalculator"><button class="btn btn-success btn-sm">Source Code</button></a>
+            <a href="http://www.karldiab.com/EthereumMiningCalculator"><button class="btn btn-primary btn-sm">Ethereum Mining Calculator</button></a>
             <a href="http://www.karldiab.com/BitcoinMiningCalculator"><button class="btn btn-warning btn-sm">Bitcoin Mining Calculator</button></a>
         </div>
     </div>
