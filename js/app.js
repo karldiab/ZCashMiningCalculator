@@ -8,7 +8,7 @@ function data($scope, $http) {
         fetch();
     }
     
-$scope.solsPerDiff = 6000;
+$scope.solsPerDiff = 8192;
 
     //this function came from https://github.com/badmofo/zcash-mining-calculator/
     //Thanks bad mofo!
