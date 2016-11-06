@@ -6,8 +6,24 @@ function data($scope, $http) {
         fetch();
     }
     
+
+$scope.solsPerDiff = 8000;
+//this function came from https://github.com/badmofo/zcash-mining-calculator/
+//Thanks bad mofo!
+$scope.blockSubsidy = function(height) {
+    var slowStartInterval = 20000;
+    var halvingInterval = 840000;
+    var fullBlockReward = 10.000;
+    var slowStartShift = slowStartInterval/2;
+    var slowStartRate = 0.0005;
+    if ( height < slowStartInterval ) {
+        return slowStartRate * (height + 1);
+    } else {
+        return fullBlockReward / Math.pow(2,Math.floor(height/halvingInterval));
+    }
+};
+
     var pendingTask;
-    
     // will load results when the string in search box changes
     $scope.change = function() {
         if(pendingTask) {
@@ -34,20 +50,18 @@ function data($scope, $http) {
         });
         $http.get("https://api.zcha.in/v1/mainnet/network")
         .success(function(response) {
-            $scope.ethereumStats = response;
-            $scope.difficulty = parseFloat(((response.difficulty)).toFixed(0));
-            console.log($scope.difficulty);
-            });
-        $http.get("https://etherchain.org/api/blocks/count")
-            .success(function(response) {
-                $scope.blockCount = response.data[0].count;
-                blockNum1MoAgo = $scope.blockCount - (30*24*60*60/$scope.blockTime);
-            })
-        $http.get("https://etherchain.org/api/block/" + Math.round(blockNum1MoAgo))
-            .success(function(response) {
-                difficulty1MoAgo = response.data[0].difficulty;
-                $scope.diffChange = parseFloat((($scope.difficulty*1e12 - difficulty1MoAgo)/1e12).toFixed(2));
-            })             
+            //parseFloat((($scope.ethereumStats.data[0].difficulty)/1e12).toFixed(4))
+            $scope.difficulty = parseFloat(((response.difficulty)/1000).toFixed(3));
+            $scope.blockReward = $scope.blockSubsidy(response.blockNumber);
+            console.log($scope.blockReward);
+            var specificBlockFetchURL = "https://api.zcha.in/v1/mainnet/blocks?sort=height&direction=descending&limit=1&offset=";
+            specificBlockFetchURL +=  Math.floor(604800/response.meanBlockTime);
+            $http.get(specificBlockFetchURL)
+                .success(function(response) {
+                    $scope.diffChange = parseFloat(($scope.difficulty - parseFloat(response[0].difficulty / 1000)).toFixed(2));
+                    console.log($scope.diffChange);
+                })
+            });        
                     
     }
 
@@ -80,27 +94,22 @@ function data($scope, $http) {
         });
     }
   /*Function that calculates the profits of the user in ethereum.*/
-  $scope.computeProfits = function() {  
-        if ($scope.userHashSuffix == "MH") {
-            $scope.userHashSuffixMult = 1e6;
-        } else if ($scope.userHashSuffix == "KH") {
+  $scope.computeProfits = function() { 
+
+        if ($scope.userHashSuffix == "s") {
+            $scope.userHashSuffixMult = 1;
+        } else if ($scope.userHashSuffix == "ks") {
             $scope.userHashSuffixMult = 1e3;
-        } else if ($scope.userHashSuffix == "GH") {
-            $scope.userHashSuffixMult = 1e9;
         }
         if ($scope.powerSuffix == "W") {
             $scope.userPowerSuffixMult = 0.001;
         } else {
             $scope.userPowerSuffixMult = 1;
         }
-        var ETHBlockTargetTime = 14;
-        var validBlockRate = ETHBlockTargetTime/$scope.blockTime > 1 ? 1 : ETHBlockTargetTime/$scope.blockTime;
-        var secondsPerHour = 3600;
-        var ethereumPerBlock = 5;
         //long block of math logic to find the hourly rates of gross earnings, power costs, pool fees, and profit
-        $scope.earnings.hourGrossETH = ($scope.userHash/($scope.difficulty*1e12))*ethereumPerBlock*secondsPerHour*$scope.userHashSuffixMult*validBlockRate;
-        $scope.values[0] = [$scope.earnings.hourGrossETH];
-        $scope.earnings.hourGrossUSD = $scope.earnings.hourGrossETH*$scope.price;
+        $scope.earnings.hourGrossZEC = ($scope.userHash/(($scope.difficulty*1e3)*$scope.solsPerDiff))*$scope.blockReward*3600*$scope.userHashSuffixMult;
+        $scope.values[0] = [$scope.earnings.hourGrossZEC];
+        $scope.earnings.hourGrossUSD = $scope.earnings.hourGrossZEC*$scope.price;
         $scope.values[1] = [$scope.earnings.hourGrossUSD];
         $scope.earnings.powerCostHour = ($scope.wattage*$scope.userPowerSuffixMult*$scope.powerCost)
         $scope.values[2] = [$scope.earnings.powerCostHour];
@@ -125,8 +134,9 @@ function data($scope, $http) {
             $scope.drawChart();
         }
   }
+    //difficuly dynamic profitable calculations are disabled 
     //function responsible for creating chart data and drawing chart
-    $scope.drawChart = function(drawNew) {
+    /*$scope.drawChart = function(drawNew) {
         var labels = [];
         $scope.profit = [0];
         var rollingDiffFactor = 1;
@@ -139,6 +149,59 @@ function data($scope, $http) {
                 $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
                 projectedDifficulty += $scope.diffChange;
                 rollingDiffFactor = $scope.difficulty/(projectedDifficulty);
+            }
+        }
+        var data = {
+                labels: labels,
+                datasets: [
+            {
+                label: "Profit",
+                fillColor: "rgba(0,0,0,0.2)",
+                strokeColor: "rgba(0,0,0,1)",
+                pointColor: "rgba(0,0,0,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: $scope.profit
+            }]
+        };
+        //logic to ensure the tooltips detect radius isn't too large when many points are present
+        if ($scope.timeFrame <= 15) {
+            var detectRadius = 8;
+        } else if ($scope.timeFrame > 15 && $scope.timeFrame <= 23) {
+            var detectRadius = 5;
+        } else if ($scope.timeFrame > 23 && $scope.timeFrame <= 30) {
+            var detectRadius = 3;
+        } else {
+            var detectRadius = 1;
+        }
+        var options = {
+            pointHitDetectionRadius : detectRadius,
+        };
+        //Chart.defaults.global.responsive = true;
+        //if the chart object doesn't exist yet, OR a complete redraw was called. Create new chart object
+        if (typeof $scope.myLineChart == "undefined" || drawNew) {
+            ctx = document.getElementById("myChart").getContext("2d");
+            $scope.myLineChart = new Chart(ctx).Line(data, options);
+        } else {
+            for (var i = 0; i < $scope.profit.length;i++) {
+                $scope.myLineChart.datasets[0].points[i].value = $scope.profit[i];
+            }
+            $scope.myLineChart.update();
+        }
+    }*/
+    //temporary static difficulty profit calc
+    $scope.drawChart = function(drawNew) {
+        var labels = [];
+        $scope.profit = [0];
+        var rollingDiffFactor = 1;
+        var projectedDifficulty = $scope.difficulty;
+        for (var i = 0; i <= $scope.timeFrame; i++) {
+            labels[i] = i + (i == 1? " Month" : " Months");
+            if (i > 0) {
+                //profit logic
+                $scope.profit[i] = $scope.profit[i-1] + ($scope.values[1][3])*rollingDiffFactor - $scope.values[2][3] - $scope.values[3][3]*rollingDiffFactor;
+                $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
             }
         }
         var data = {

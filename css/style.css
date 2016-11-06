@@ -29,6 +29,7 @@ table {
 }
 #outputTable td {
     background-color: #eee;
+    border: 3px white solid;
 }
 #mobileAdBanner {
     display: none;
@@ -52,9 +53,6 @@ and (max-width : 500px) {
     #bigTitle {
         display: none;
     }
-}
-td {
-    border: 2px white solid;
 }
 .negative {
     color: red;
