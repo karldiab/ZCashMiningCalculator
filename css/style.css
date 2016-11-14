@@ -29,7 +29,6 @@ table {
 }
 #outputTable td {
     background-color: #eee;
-    border: 3px white solid;
 }
 #mobileAdBanner {
     display: none;
@@ -38,14 +37,17 @@ table {
     display: none;
 }
 #desktopAdBanner {
+    margin-top: 10px;
     display: block;
     text-align: center;
     
 }
+
 @media screen 
 and (max-width : 500px) {
     #mobileAdBanner,
     #smallTitle {
+    margin-top: 10px;
         display: block;
         text-align: center;
     }
@@ -53,6 +55,9 @@ and (max-width : 500px) {
     #bigTitle {
         display: none;
     }
+}
+td {
+    border: 2px white solid;
 }
 .negative {
     color: red;
@@ -74,4 +79,9 @@ and (max-width : 500px) {
 }
 #axisChange {
     width: 50px;
+}
+#infoMessage {
+    text-align: center;
+    color: #430056;
+    margin-bottom: 5px;
 }
