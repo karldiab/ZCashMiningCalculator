@@ -212,12 +212,13 @@
                 too difficult to predict for such a long time frame. Dynamic-difficulty future profit prediction will be enabled after the
                 slow-start ends.</li>
             <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
-            <li>I'm actively tweaking the profitability calculation so accuracy will improve over the next few days.</li>
+            <li>Do you find this calculator accurate/inaccurate or have a question or comment? Send me an email, link below!</li>
             <li>The utility fetches live ZCash network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
     </div>
     <div id="authorInfo">
         <a href="http://www.karldiab.com"><button class="btn btn-success btn-sm">Website</button></a>
-        <a href="https://github.com/karldiab/ZCashMiningCalculator"><button class="btn btn-primary btn-sm">Source Code</button></a>
+        <a href='&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#107;&#97;&#114;&#108;&#64;&#107;&#97;&#114;&#108;&#100;&#105;&#97;&#98;&#46;&#99;&#111;&#109;'><button class="btn btn-primary btn-sm">Email</button></a>
+        <a href="https://github.com/karldiab/ZCashMiningCalculator"><button class="btn btn-danger btn-sm">Source Code</button></a>
     </div>
     <?php 
     echoBottomHalf();
