@@ -38,7 +38,7 @@
         <div id="bigTitle"><h2>ZCash Mining Calculator</h2></div>
         <div id="smallTitle"><h4>ZCash Mining Calculator</h4></div>
         <div id="infoMessage">
-            <p>Please consider disabling your ad blocker <span class="glyphicon glyphicon glyphicon-heart" aria-hidden="true"></span></p>
+            <p>Now with 9 currencies! <span class="glyphicon glyphicon glyphicon-heart" aria-hidden="true"></span></p>
         </div>   
     </div>
     <div id="desktopAdBanner">
@@ -92,8 +92,13 @@
                             <option value="USD" ng-init="currencyCode = 'USD'">USD</option>
                             <option value="RUB">RUB</option>
                             <option value="CNY">CNY</option>
-                            <option value="CAD">CAD</option>
                             <option value="EUR">EUR</option>
+                            <option value="CAD">CAD</option>
+                            <option value="HKD">HKD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="JPY">JPY</option>
+                            <option value="AUD">AUD</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
