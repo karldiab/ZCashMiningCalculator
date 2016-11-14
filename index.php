@@ -213,7 +213,7 @@
                 slow-start ends.</li>
             <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
             <li>I'm actively tweaking the profitability calculation so accuracy will improve over the next few days.</li>
-            <li>The utility fetches live Ethereum network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
+            <li>The utility fetches live ZCash network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
     </div>
     <div id="authorInfo">
         <a href="http://www.karldiab.com"><button class="btn btn-success btn-sm">Website</button></a>
