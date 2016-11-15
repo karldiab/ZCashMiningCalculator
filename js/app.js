@@ -44,7 +44,7 @@ $scope.solsPerDiff = 8192;
         //function that grabs api data from the net
         function fetch() {
             //finding average price between 3 high volume exchanges.
-            $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/zec")
+            $http.get("https://coinmarketcap-nexuist.rhcloud.com/api/zec")
             .success(function(response) {
                 $scope.price = response.price.usd;
                 $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
@@ -67,7 +67,7 @@ $scope.solsPerDiff = 8192;
         //this function grabs price data only when the currency is changed
         $scope.fetchPriceOnly = function() {
             //finding average price between 3 high volume exchanges.
-            $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/zec")
+            $http.get("https://coinmarketcap-nexuist.rhcloud.com/api/zec")
             .success(function(response) {
                 if ($scope.currency == "USD") {
                     $scope.price = response.price.usd;
