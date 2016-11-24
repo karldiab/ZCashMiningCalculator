@@ -158,115 +158,75 @@ $scope.solsPerDiff = 8192;
                 $scope.drawChart();
             }
     }
-        //difficuly dynamic profitable calculations are disabled 
-        //function responsible for creating chart data and drawing chart
-        /*$scope.drawChart = function(drawNew) {
-            var labels = [];
-            $scope.profit = [0];
-            var rollingDiffFactor = 1;
-            var projectedDifficulty = $scope.difficulty;
-            for (var i = 0; i <= $scope.timeFrame; i++) {
-                labels[i] = i + (i == 1? " Month" : " Months");
-                if (i > 0) {
-                    //profit logic
-                    $scope.profit[i] = $scope.profit[i-1] + ($scope.values[1][3])*rollingDiffFactor - $scope.values[2][3] - $scope.values[3][3]*rollingDiffFactor;
-                    $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
-                    projectedDifficulty += $scope.diffChange;
-                    rollingDiffFactor = $scope.difficulty/(projectedDifficulty);
+    //function responsible for creating chart data and drawing chart
+    $scope.drawChart = function(drawNew) {
+        var labels = [];
+        $scope.profit = [0];
+        var rollingDiffFactor = 1;
+        var projectedDifficulty = $scope.difficulty;
+        for (var i = 0; i <= $scope.timeFrame; i++) {
+            labels[i] = i + (i == 1? " Month" : " Months");
+            if (i > 0) {
+                //profit logic
+                $scope.profit[i] = $scope.profit[i-1] + ($scope.values[1][3])*rollingDiffFactor - $scope.values[2][3] - $scope.values[3][3]*rollingDiffFactor;
+                $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
+
+                if ($scope.diffChange > 0) {
+                    if ($scope.diffChange/$scope.difficulty > 0.1) {
+                        projectedDifficulty += (($scope.diffChange/$scope.difficulty)*$scope.diffChange*30.0/7.0);
+                    } else {
+                        projectedDifficulty += ($scope.diffChange*30.0/7.0);
+                    }
+                } else if (-($scope.diffChange/$scope.difficulty) > 0.4) {
+                    projectedDifficulty = $scope.difficulty;
+                } else {
+                    projectedDifficulty *= 1 + ($scope.diffChange*30.0/7.0)/$scope.difficulty;
                 }
-            }
-            var data = {
-                    labels: labels,
-                    datasets: [
-                {
-                    label: "Profit",
-                    fillColor: "rgba(0,0,0,0.2)",
-                    strokeColor: "rgba(0,0,0,1)",
-                    pointColor: "rgba(0,0,0,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: $scope.profit
-                }]
-            };
-            //logic to ensure the tooltips detect radius isn't too large when many points are present
-            if ($scope.timeFrame <= 15) {
-                var detectRadius = 8;
-            } else if ($scope.timeFrame > 15 && $scope.timeFrame <= 23) {
-                var detectRadius = 5;
-            } else if ($scope.timeFrame > 23 && $scope.timeFrame <= 30) {
-                var detectRadius = 3;
-            } else {
-                var detectRadius = 1;
-            }
-            var options = {
-                pointHitDetectionRadius : detectRadius,
-            };
-            //Chart.defaults.global.responsive = true;
-            //if the chart object doesn't exist yet, OR a complete redraw was called. Create new chart object
-            if (typeof $scope.myLineChart == "undefined" || drawNew) {
-                ctx = document.getElementById("myChart").getContext("2d");
-                $scope.myLineChart = new Chart(ctx).Line(data, options);
-            } else {
-                for (var i = 0; i < $scope.profit.length;i++) {
-                    $scope.myLineChart.datasets[0].points[i].value = $scope.profit[i];
+                if (projectedDifficulty < 1) {
+                    projectedDifficulty = 1;
                 }
-                $scope.myLineChart.update();
-            }
-        }*/
-        //temporary static difficulty profit calc
-        $scope.drawChart = function(drawNew) {
-            var labels = [];
-            $scope.profit = [0];
-            var rollingDiffFactor = 1;
-            var projectedDifficulty = $scope.difficulty;
-            for (var i = 0; i <= $scope.timeFrame; i++) {
-                labels[i] = i + (i == 1? " Month" : " Months");
-                if (i > 0) {
-                    //profit logic
-                    $scope.profit[i] = $scope.profit[i-1] + ($scope.values[1][3])*rollingDiffFactor - $scope.values[2][3] - $scope.values[3][3]*rollingDiffFactor;
-                    $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
-                }
-            }
-            var data = {
-                    labels: labels,
-                    datasets: [
-                {
-                    label: "Profit",
-                    fillColor: "rgba(0,0,0,0.2)",
-                    strokeColor: "rgba(0,0,0,1)",
-                    pointColor: "rgba(0,0,0,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: $scope.profit
-                }]
-            };
-            //logic to ensure the tooltips detect radius isn't too large when many points are present
-            if ($scope.timeFrame <= 15) {
-                var detectRadius = 8;
-            } else if ($scope.timeFrame > 15 && $scope.timeFrame <= 23) {
-                var detectRadius = 5;
-            } else if ($scope.timeFrame > 23 && $scope.timeFrame <= 30) {
-                var detectRadius = 3;
-            } else {
-                var detectRadius = 1;
-            }
-            var options = {
-                pointHitDetectionRadius : detectRadius,
-            };
-            //Chart.defaults.global.responsive = true;
-            //if the chart object doesn't exist yet, OR a complete redraw was called. Create new chart object
-            if (typeof $scope.myLineChart == "undefined" || drawNew) {
-                ctx = document.getElementById("myChart").getContext("2d");
-                $scope.myLineChart = new Chart(ctx).Line(data, options);
-            } else {
-                for (var i = 0; i < $scope.profit.length;i++) {
-                    $scope.myLineChart.datasets[0].points[i].value = $scope.profit[i];
-                }
-                $scope.myLineChart.update();
+                rollingDiffFactor = $scope.difficulty/(projectedDifficulty);
             }
         }
+        var data = {
+                labels: labels,
+                datasets: [
+            {
+                label: "Profit",
+                fillColor: "rgba(0,0,0,0.2)",
+                strokeColor: "rgba(0,0,0,1)",
+                pointColor: "rgba(0,0,0,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: $scope.profit
+            }]
+        };
+        //logic to ensure the tooltips detect radius isn't too large when many points are present
+        if ($scope.timeFrame <= 15) {
+            var detectRadius = 8;
+        } else if ($scope.timeFrame > 15 && $scope.timeFrame <= 23) {
+            var detectRadius = 5;
+        } else if ($scope.timeFrame > 23 && $scope.timeFrame <= 30) {
+            var detectRadius = 3;
+        } else {
+            var detectRadius = 1;
+        }
+        var options = {
+            pointHitDetectionRadius : detectRadius,
+        };
+        //Chart.defaults.global.responsive = true;
+        //if the chart object doesn't exist yet, OR a complete redraw was called. Create new chart object
+        if (typeof $scope.myLineChart == "undefined" || drawNew) {
+            ctx = document.getElementById("myChart").getContext("2d");
+            $scope.myLineChart = new Chart(ctx).Line(data, options);
+        } else {
+            for (var i = 0; i < $scope.profit.length;i++) {
+                $scope.myLineChart.datasets[0].points[i].value = $scope.profit[i];
+            }
+            $scope.myLineChart.update();
+        }
+    }
         //Function that is called when user changes the number of months are to be included in the chart
         //destroys all old chart data then calls the drawChart function to create new data
         $scope.changeAxis = function() {

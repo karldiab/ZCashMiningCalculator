@@ -208,9 +208,7 @@
     <div id="notes">
         <h4>Notes</h4>
         <ul>
-            <li style="color: red;">For the graph, future difficulty changes or block reward increases are not yet taken into account, these factors make profitability
-                too difficult to predict for such a long time frame. Dynamic-difficulty future profit prediction will be enabled after the
-                slow-start ends.</li>
+            <li>Future difficulty prediction factor has been added to the graph! Clear your cache if it's not working for you.</li>
             <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
             <li>Do you find this calculator accurate/inaccurate or have a question or comment? Send me an email, link below!</li>
             <li>The utility fetches live ZCash network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
