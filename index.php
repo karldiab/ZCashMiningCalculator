@@ -37,9 +37,9 @@
     <div id="header">
         <div id="bigTitle"><h2>ZCash Mining Calculator</h2></div>
         <div id="smallTitle"><h4>ZCash Mining Calculator</h4></div>
-        <!--<div id="infoMessage">
-            <p></p>
-        </div>-->   
+        <div id="infoMessage">
+            <p><img src="../images/XMR.png"> Monero calculator added. Check it out!</p>
+        </div>  
     </div>
     <div id="desktopAdBanner">
         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -171,7 +171,7 @@
                         </tr>
                         <tr>
                             <td>Yearly</td>
-                            <td>{{values[0][4]|number:4}}</td>
+                            <td>{{values[0][4]|number:3}}</td>
                             <td>{{values[1][4]|currency}}</td>
                             <td>{{values[2][4]|currency}}</td>
                             <td>{{values[3][4]|currency}}</td>
