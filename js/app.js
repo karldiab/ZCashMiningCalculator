@@ -54,8 +54,7 @@ $scope.solsPerDiff = 8192;
                 //parseFloat((($scope.ethereumStats.data[0].difficulty)/1e12).toFixed(4))
                 $scope.difficulty = parseInt((response.difficulty));
                 $scope.blockReward = $scope.blockSubsidy(response.blockNumber);
-                var specificBlockFetchURL = "https://api.zcha.in/v1/mainnet/blocks?sort=height&direction=descending&limit=1&offset=";
-                specificBlockFetchURL +=  Math.floor(604800/response.meanBlockTime);
+                var specificBlockFetchURL = "https://api.zcha.in/v1/mainnet/blocks?sort=height&direction=descending&limit=1&offset=4032";
                 $http.get(specificBlockFetchURL)
                     .success(function(response) {
                         $scope.diffChange = ($scope.difficulty - parseInt(response[0].difficulty));
