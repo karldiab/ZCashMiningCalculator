@@ -15,7 +15,8 @@ app.factory('socket', ['$rootScope', function($rootScope) {
 }]);
 
 app.controller("data", function data($scope, $http, socket) {
-    
+    $scope.dynamicDifficulty = true;
+    $scope.dynamicDifficultyString = "On";
     $scope.autoUpdate = true;
     $scope.autoUpdateString = "On";
     $scope.turnAutoUpdateOff = function() {
@@ -29,8 +30,20 @@ app.controller("data", function data($scope, $http, socket) {
                 $scope.autoUpdateString = "Off";
             }
         });
-    
-    
+    $scope.$watch('dynamicDifficulty', function() {
+            if ($scope.dynamicDifficulty) {
+                $scope.dynamicDifficultyString = "On";
+            } else {
+                $scope.dynamicDifficultyString = "Off";
+                $scope.dynamicDiffWarning = false;
+            }
+        });
+    $scope.dynamicDiffRedrawChart = function() {
+        $scope.drawChart();
+    }
+    $scope.turnDynamicDifficultyOn = function() {
+        $scope.dynamicDifficulty = true;
+    }
     socket.on('connectionReady', function() {
         //console.log('got connectionReady emitting request');
         socket.emit('requestInfo');
@@ -142,20 +155,27 @@ app.controller("data", function data($scope, $http, socket) {
                 //profit logic
                 $scope.profit[i] = $scope.profit[i-1] + ($scope.values[1][3])*rollingDiffFactor - $scope.values[2][3] - $scope.values[3][3]*rollingDiffFactor;
                 $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
-
-                if ($scope.diffChange > 0) {
-                    if ($scope.diffChange/$scope.difficulty > 0.1) {
-                        projectedDifficulty += (($scope.diffChange/$scope.difficulty)*$scope.diffChange*30.0/7.0);
+                if ($scope.dynamicDifficulty) {
+                    if ($scope.diffChange > 0) {
+                        if ($scope.diffChange/$scope.difficulty > 0.35) {
+                            projectedDifficulty += ($scope.diffChange*30.0/7.0);
+                            //projectedDifficulty += (($scope.diffChange/$scope.difficulty)*$scope.diffChange*30.0/7.0);
+                            $scope.dynamicDiffWarning = true;
+                        } else {
+                            projectedDifficulty += ($scope.diffChange*30.0/7.0);
+                            $scope.dynamicDiffWarning = false;
+                        }
+                    } else if (-($scope.diffChange/$scope.difficulty) > 0.1) {
+                        //projectedDifficulty = $scope.difficulty;
+                        projectedDifficulty *= 1 + ($scope.diffChange*30.0/7.0)/$scope.difficulty;
+                        $scope.dynamicDiffWarning = true;
                     } else {
-                        projectedDifficulty += ($scope.diffChange*30.0/7.0);
+                        projectedDifficulty *= 1 + ($scope.diffChange*30.0/7.0)/$scope.difficulty;
+                        $scope.dynamicDiffWarning = false;
                     }
-                } else if (-($scope.diffChange/$scope.difficulty) > 0.4) {
-                    projectedDifficulty = $scope.difficulty;
-                } else {
-                    projectedDifficulty *= 1 + ($scope.diffChange*30.0/7.0)/$scope.difficulty;
-                }
-                if (projectedDifficulty < 1) {
-                    projectedDifficulty = 1;
+                    if (projectedDifficulty < 1) {
+                        projectedDifficulty = 1;
+                    }
                 }
                 rollingDiffFactor = $scope.difficulty/(projectedDifficulty);
             }

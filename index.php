@@ -122,7 +122,7 @@
                     </tr>
                     <tr>
                         <th>Diff Change</th>
-                        <td><input type="number" ng-model="diffChange" ng-change="computeProfits(); turnAutoUpdateOff()"/> / Week</td>
+                        <td><input type="number" ng-model="diffChange" ng-change="computeProfits(); turnAutoUpdateOff()"/> / Week <div ng-show="dynamicDiffWarning" id="dynamicDiffWarning" style="display: inline;"><p style="color: red; font-size:16px; display: inline;"> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></p></div></td>
                     </tr>
                     <th>Live Stats:</th>
                     <td>
@@ -193,13 +193,30 @@
         </div>
         <div class="col-md-5 animated fadeIn" id="chartContainer">
             <div id="chartNotReady" ng-hide="myLineChart">
-                <h3>Enter hashrate data for responsive chart!</h3>
+                <div id="bigTitle">
+                    <h3>Enter hashrate data for responsive chart!</h3>
+                </div>
+                <div id="smallTitle">
+                    <h4>Enter hashrate data for responsive chart!</h4>
+                </div>
             </div>
             <div  ng-show="myLineChart">
-            <h3>Estimated Total Future Profits ({{currency}})</h3>
+            <div id="bigTitle">
+                <h3>Estimated Total Future Profits ({{currency}})</h3>
+            </div>
+            <div id="smallTitle">
+                <h4>Estimated Total Future Profits ({{currency}})</h4>
+            </div>
             <canvas id="myChart" height="400px" width="300px"></canvas><br/>
             Time Frame:
             <input type="number" ng-model="timeFrame" id="axisChange" ng-init="timeFrame = 6" ng-change="changeAxis()"/> Months</br>
+            Dynamic Difficulty: 
+            <label class="switch">
+                <input type="checkbox" ng-model="dynamicDifficulty" ng-change="dynamicDiffRedrawChart()">
+                <div class="slider round"></div> {{dynamicDifficultyString}}
+            </label>
+                <div ng-show="dynamicDiffWarning" id="dynamicDiffWarning" style="display: inline;"><p style="color: red; font-size:18px; display: inline;"> &nbsp;<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></p></div>
+            
             </div>
         </div>
         <div class="col-md-2">
@@ -218,6 +235,7 @@
     <div id="notes">
         <h4>Notes</h4>
         <ul>
+            <li ng-show="dynamicDiffWarning" style="color: red;"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Diff Change value is too large. Future profitability estimates may be inaccurate. Consider making Diff Change smaller or turning off Dynamic Difficulty.</li>
             <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
             <li>Do you find this calculator accurate/inaccurate or have a question or comment? Send me an email, link below!</li>
             <li>The utility fetches live ZCash network & price data from a nodeJS backend and foreign currency rates from www.coinmarketcap.com</li>
