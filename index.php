@@ -1,20 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" ng-app ng-controller="data">
+<html lang="en" ng-app="miningCalc" ng-controller="data">
   <head>
     <title>ZCash Mining Calculator</title>
     <meta name="description" content="An easy to use crypto-currency finance utility used to calculate a ZCash miner's potential profits in ETH and multiple fiat
                                 currencies. The calculator fetches price and network data from the internet
                                  and only requires the hash rate (speed of mining) from the user. A projected future profit
                                   chart is created dynamically and displayed instantly.">
-    <meta name="keywords" content="ZCash,Mining,Profitability,Calculator,AngularJS,AJAX,finance,currency,cryptocurrency,money,bitcoin,Ethereum">
+    <meta name="keywords" content="ZCash,Mining,Profitability,Calculator,AngularJS,node,nodeJS,finance,currency,cryptocurrency,money,bitcoin,Ethereum">
     <meta name="author" content="Karl Diab">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
-    <script src="js/app.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.0/angular-route.js"></script>
+    <script src="js/app1.js"></script>
     <script src="js/Chart.min.js"></script>
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style1.css">
     <link rel='stylesheet' href='../MiningCalcSideBar/style/style.css'>
     <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
     <script>
@@ -35,10 +37,10 @@
     echoTopHalf();
     ?> 
     <div id="header">
-        <div id="bigTitle"><h2>ZCash Mining Calculator</h2></div>
-        <div id="smallTitle"><h4>ZCash Mining Calculator</h4></div>
+        <div id="bigTitle"><h2><img src="images/ZCashLogo.png" style="position: relative; bottom: 4px; right: 2px;">ZCash Mining Calculator</h2></div>
+        <div id="smallTitle"><h4><img src="images/ZCashLogo.png" style="position: relative; bottom: 4px; right: 2px; height: 25px; width: 25px;">ZCash Mining Calculator</h4></div>
         <div id="infoMessage">
-            <p><img src="../images/XMR.png"> Monero calculator added. Check it out!</p>
+            <p>Now with LIVE stats!</p>
         </div>  
     </div>
     <div id="desktopAdBanner">
@@ -79,16 +81,16 @@
                     </tr>
                     <tr>
                         <th>Difficulty:</th>
-                        <td><input type="number" ng-model="difficulty" ng-change="computeProfits()"/></td>
+                        <td><input type="number" ng-model="difficulty" ng-change="computeProfits(); turnAutoUpdateOff()"/></td>
                     </tr>
                     <tr>
                         <th>Block Reward:</th>
-                        <td><input type="number" ng-model="blockReward" ng-change="computeProfits()"/> ZEC</td>
+                        <td><input type="number" ng-model="blockReward" ng-change="computeProfits(); turnAutoUpdateOff()"/> ZEC</td>
                     </tr>
                     <tr>
                         <th>ZEC Price:</th>
-                        <td><input type="number" ng-model="price" ng-change="computeProfits()"/>
-                            <select ng-model="currency" ng-change="fetchPriceOnly()">
+                        <td><input type="number" ng-model="price" ng-change="computeProfits(); turnAutoUpdateOff()"/>
+                            <select ng-model="currency" ng-change="calculatePrice()">
                             <option value="USD" ng-init="currencyCode = 'USD'">USD</option>
                             <option value="RUB">RUB</option>
                             <option value="CNY">CNY</option>
@@ -120,8 +122,16 @@
                     </tr>
                     <tr>
                         <th>Diff Change</th>
-                        <td><input type="number" ng-model="diffChange" ng-change="computeProfits()"/> / Week</td>
+                        <td><input type="number" ng-model="diffChange" ng-change="computeProfits(); turnAutoUpdateOff()"/> / Week</td>
                     </tr>
+                    <th>Live Stats:</th>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" ng-model="autoUpdate">
+                            <div class="slider round"></div>
+                            <div id="autoUpdateString">{{autoUpdateString}} </span></div>
+                        </label>
+                    </td>
                 </table>
                 <h3>Profits At This Difficulty</h3>
             <div>
@@ -208,10 +218,9 @@
     <div id="notes">
         <h4>Notes</h4>
         <ul>
-            <li>Future difficulty prediction factor has been added to the graph! Clear your cache if it's not working for you.</li>
             <li>Remember to take your hashrate from what your pool reports, this eliminates any error from stale shares and miner dev fees (Claymore's miner)</li>
             <li>Do you find this calculator accurate/inaccurate or have a question or comment? Send me an email, link below!</li>
-            <li>The utility fetches live ZCash network & price data from https://explorer.zcha.in and http://coinmarketcap.com</li>
+            <li>The utility fetches live ZCash network & price data from a nodeJS backend and foreign currency rates from www.coinmarketcap.com</li>
     </div>
     <div id="authorInfo">
         <a href="http://www.karldiab.com"><button class="btn btn-success btn-sm">Website</button></a>

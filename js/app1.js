@@ -1,120 +1,93 @@
+var app = angular.module("miningCalc", ['ngRoute']);
 
+app.factory('socket', ['$rootScope', function($rootScope) {
+  var socket = io.connect("http://144.217.85.254:1235/ZEC");
+  //var socket = io.connect("http://localhost:1235");
 
-function data($scope, $http) {
+  return {
+    on: function(eventName, callback){
+      socket.on(eventName, callback);
+    },
+    emit: function(eventName, data) {
+      socket.emit(eventName, data);
+    }
+  };
+}]);
+
+app.controller("data", function data($scope, $http, socket) {
+    
+    $scope.autoUpdate = true;
+    $scope.autoUpdateString = "On";
+    $scope.turnAutoUpdateOff = function() {
+        $scope.autoUpdate = false;
+    }
+    $scope.$watch('autoUpdate', function() {
+            if ($scope.autoUpdate) {
+                socket.emit('requestInfo');
+                $scope.autoUpdateString = "On";
+            } else {
+                $scope.autoUpdateString = "Off";
+            }
+        });
+    
+    
+    socket.on('connectionReady', function() {
+        //console.log('got connectionReady emitting request');
+        socket.emit('requestInfo');
+    })
+    socket.on('profitabilityUpdate', function(data) {
+        $scope.$apply(function () {
+            if ($scope.autoUpdate) {
+                $scope.updateStats(data);
+                $scope.computeProfits();
+            }
+        });
+    });
     // when the page loads for the first time
     if($scope.search == undefined) {
         $scope.search = "hi";
         $scope.currency = "USD";
-        fetch();
     }
     
-$scope.solsPerDiff = 8192;
-
-    //this function came from https://github.com/badmofo/zcash-mining-calculator/
-    //Thanks bad mofo!
-    $scope.blockSubsidy = function(height) {
-        var slowStartInterval = 20000;
-        var halvingInterval = 840000;
-        var fullBlockReward = 10.000;
-        var slowStartRate = 0.0005;
-        if ( height < slowStartInterval ) {
-            return (slowStartRate * (height + 1));
-        } else {
-            return fullBlockReward / Math.pow(2,Math.floor(height/halvingInterval));
-        }
-    };
+        $scope.solsPerDiff = 8192;
 
         var pendingTask;
-        // will load results when the string in search box changes
-        $scope.change = function() {
-            if(pendingTask) {
-                clearTimeout(pendingTask);
-            }
-            pendingTask = setTimeout(fetch, 800);
-        };
-        $scope.update = function() {
-            $scope.search = $scope.others.Search[index].Title;
-            $scope.change();
-        };
-        $scope.select = function() {
-            this.setSelectionRange(0, this.value.length);
-        }
+
         $scope.earnings = {};
         $scope.values = [];
-        //function that grabs api data from the net
-        function fetch() {
-            //finding average price between 3 high volume exchanges.
-            $http.get("https://coinmarketcap-nexuist.rhcloud.com/api/zec")
-            .success(function(response) {
-                $scope.price = response.price.usd;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-            });
-            $http.get("https://api.zcha.in/v1/mainnet/network")
-            .success(function(response) {
-                //parseFloat((($scope.ethereumStats.data[0].difficulty)/1e12).toFixed(4))
-                $scope.difficulty = parseInt((response.difficulty));
-                $scope.blockReward = $scope.blockSubsidy(response.blockNumber);
-                var specificBlockFetchURL = "https://api.zcha.in/v1/mainnet/blocks?sort=height&direction=descending&limit=1&offset=4032";
-                $http.get(specificBlockFetchURL)
-                    .success(function(response) {
-                        $scope.diffChange = ($scope.difficulty - parseInt(response[0].difficulty));
-                    })
-                });        
-                        
+        
+        $scope.updateStats = function(data) {
+            $scope.priceUSD = data.priceUSD;
+            $scope.calculatePrice();
+            $scope.difficulty = data.difficulty;
+            $scope.difficulty = parseFloat(($scope.difficulty).toFixed(0));
+            $scope.diffChange = data.diffChange;
+            $scope.blockReward = data.blockReward;
+            $scope.diffChange = parseFloat(parseFloat($scope.diffChange).toFixed(0));
         }
-
+        
         //this function grabs price data only when the currency is changed
-        $scope.fetchPriceOnly = function() {
-            //finding average price between 3 high volume exchanges.
-            $http.get("https://coinmarketcap-nexuist.rhcloud.com/api/zec")
+        $scope.getCurrencyRates = function() {
+            $http.get("http://coinmarketcap-nexuist.rhcloud.com/api/eth")
             .success(function(response) {
-                if ($scope.currency == "USD") {
-                    $scope.price = response.price.usd;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "CNY") {
-                    $scope.price = response.price.cny;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "RUB") {
-                    $scope.price = response.price.rub;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "CAD") {
-                    $scope.price = response.price.cad;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "EUR") {
-                    $scope.price = response.price.eur;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "JPY") {
-                    $scope.price = response.price.jpy;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "GBP") {
-                    $scope.price = response.price.gbp;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "HKD") {
-                    $scope.price = response.price.hkd;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
-                } else if ($scope.currency == "AUD") {
-                    $scope.price = response.price.aud;
-                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
-                    $scope.computeProfits();
-                    return;
+                $scope.currencyRates = {};
+                for (var currency in response.price) {
+                    $scope.currencyRates[currency] = response.price[currency]/response.price.usd;
                 }
-            });
+                $scope.calculatePrice();
+            })
+        }
+        $scope.calculatePrice = function() {
+            if ($scope.currency == "USD") {
+                $scope.price = $scope.priceUSD;
+                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
+            } else if (typeof $scope.currencyRates === 'undefined') {
+                $scope.getCurrencyRates();
+                return;
+            } else {
+                $scope.price = $scope.priceUSD *  $scope.currencyRates[$scope.currency.toLowerCase()];
+                $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
+            }
         }
     /*Function that calculates the profits of the user in ethereum.*/
     $scope.computeProfits = function() { 
@@ -232,4 +205,4 @@ $scope.solsPerDiff = 8192;
             $scope.myLineChart.destroy();
             $scope.drawChart(true);
         }
-}
+})
