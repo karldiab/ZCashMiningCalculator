@@ -63,9 +63,6 @@ app.controller("data", function data($scope, $http, socket) {
     }
     
         $scope.solsPerDiff = 8192;
-
-        var pendingTask;
-
         $scope.earnings = {};
         $scope.values = [];
         
@@ -157,7 +154,7 @@ app.controller("data", function data($scope, $http, socket) {
                 $scope.profit[i] =  parseFloat($scope.profit[i].toFixed(2));
                 if ($scope.dynamicDifficulty) {
                     if ($scope.diffChange > 0) {
-                        if ($scope.diffChange/$scope.difficulty > 0.35) {
+                        if ($scope.diffChange/$scope.difficulty > 0.0625) {
                             projectedDifficulty += ($scope.diffChange*30.0/7.0);
                             //projectedDifficulty += (($scope.diffChange/$scope.difficulty)*$scope.diffChange*30.0/7.0);
                             $scope.dynamicDiffWarning = true;
@@ -165,7 +162,7 @@ app.controller("data", function data($scope, $http, socket) {
                             projectedDifficulty += ($scope.diffChange*30.0/7.0);
                             $scope.dynamicDiffWarning = false;
                         }
-                    } else if (-($scope.diffChange/$scope.difficulty) > 0.1) {
+                    } else if (-($scope.diffChange/$scope.difficulty) > 0.0625) {
                         //projectedDifficulty = $scope.difficulty;
                         projectedDifficulty *= 1 + ($scope.diffChange*30.0/7.0)/$scope.difficulty;
                         $scope.dynamicDiffWarning = true;
