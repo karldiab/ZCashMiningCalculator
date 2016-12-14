@@ -68,7 +68,7 @@ app.controller("data", function data($scope, $http, socket) {
         
         $scope.updateStats = function(data) {
             $scope.priceUSD = data.priceUSD;
-            $scope.calculatePrice();
+            $scope.calculatePrice(false);
             $scope.difficulty = data.difficulty;
             $scope.difficulty = parseFloat(($scope.difficulty).toFixed(0));
             $scope.diffChange = data.diffChange;
@@ -84,10 +84,10 @@ app.controller("data", function data($scope, $http, socket) {
                 for (var currency in response.price) {
                     $scope.currencyRates[currency] = response.price[currency]/response.price.usd;
                 }
-                $scope.calculatePrice();
+                $scope.calculatePrice(true);
             })
         }
-        $scope.calculatePrice = function() {
+        $scope.calculatePrice = function(computeProfitsAfter) {
             if ($scope.currency == "USD") {
                 $scope.price = $scope.priceUSD;
                 $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
@@ -97,6 +97,9 @@ app.controller("data", function data($scope, $http, socket) {
             } else {
                 $scope.price = $scope.priceUSD *  $scope.currencyRates[$scope.currency.toLowerCase()];
                 $scope.price = parseFloat(parseFloat($scope.price).toFixed(2));
+            }
+            if (computeProfitsAfter) {
+                $scope.computeProfits();
             }
         }
     /*Function that calculates the profits of the user in ethereum.*/
